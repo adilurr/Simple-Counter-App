@@ -1,0 +1,88 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'models/counter_model.dart';
+import 'widgets/counter_widget.dart';
+
+void main() {
+  runApp(
+    // Provide the CounterModel to the entire widget tree.
+    ChangeNotifierProvider(
+      create: (context) => CounterModel(),
+      child: const MyApp(),
+    ),
+  );
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // Consumer widget listens for changes in CounterModel to rebuild the theme.
+    return Consumer<CounterModel>(
+      builder: (context, counterModel, child) {
+        return MaterialApp(
+          title: 'Enhanced Counter App',
+          theme: counterModel.currentTheme,
+          debugShowCheckedModeBanner: false,
+          home: const MyHomePage(),
+        );
+      },
+    );
+  }
+}
+
+class MyHomePage extends StatelessWidget {
+  const MyHomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // Use a consumer here as well to get access to the model for building the UI.
+    return Consumer<CounterModel>(
+      builder: (context, counterModel, child) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Multi Counter'),
+            actions: [
+              // Theme toggle button
+              IconButton(
+                icon: Icon(
+                  counterModel.isDarkMode
+                      ? Icons.light_mode
+                      : Icons.dark_mode,
+                ),
+                onPressed: () => counterModel.toggleTheme(),
+                tooltip: 'Toggle Theme',
+              ),
+            ],
+          ),
+          body: counterModel.counters.isEmpty
+              ? const Center(
+                  child: Text(
+                  'No counters yet. Tap + to add one!',
+                  style: TextStyle(fontSize: 18.0, color: Colors.grey),
+                ))
+              : ListView.builder(
+                  padding: const EdgeInsets.only(top: 8, bottom: 80), // Padding for FAB
+                  itemCount: counterModel.counters.length,
+                  itemBuilder: (context, index) {
+                    // Each counter is represented by a CounterWidget.
+                    return CounterWidget(index: index);
+                  },
+                ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => counterModel.addCounter(),
+            tooltip: 'Add Counter',
+            // Animate the FAB icon change on press.
+            child: const AnimatedSwitcher(
+              duration: Duration(milliseconds: 300),
+              transitionBuilder: (child, animation) =>
+                  RotationTransition(turns: animation, child: child),
+              child: Icon(Icons.add, key: ValueKey('add_icon')),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
