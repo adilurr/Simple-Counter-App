@@ -1,0 +1,86 @@
+import 'package:flutter/material.dart';
+
+// A simple class to hold the value of a single counter.
+class Counter {
+  int value = 0;
+}
+
+// The main model for our app state. It manages the list of counters and the theme.
+// It extends ChangeNotifier to notify listening widgets of any changes.
+class CounterModel extends ChangeNotifier {
+  final List<Counter> _counters = [];
+  bool _isDarkMode = false;
+
+  // Public getters to access state safely from the UI.
+  List<Counter> get counters => _counters;
+  bool get isDarkMode => _isDarkMode;
+  ThemeData get currentTheme => _isDarkMode ? darkTheme : lightTheme;
+
+  // Method to add a new counter to the list.
+  void addCounter() {
+    _counters.add(Counter());
+    notifyListeners(); // Tell widgets listening to this model to rebuild.
+  }
+
+  // Methods to modify a specific counter by its index.
+  void increment(int index) {
+    if (index >= 0 && index < _counters.length) {
+      _counters[index].value++;
+      notifyListeners();
+    }
+  }
+
+  void decrement(int index) {
+    if (index >= 0 && index < _counters.length) {
+      _counters[index].value--;
+      notifyListeners();
+    }
+  }
+
+  void reset(int index) {
+    if (index >= 0 && index < _counters.length) {
+      _counters[index].value = 0;
+      notifyListeners();
+    }
+  }
+  
+  // Method to toggle the theme between light and dark.
+  void toggleTheme() {
+    _isDarkMode = !_isDarkMode;
+    notifyListeners();
+  }
+}
+
+// Define our custom light theme data.
+final ThemeData lightTheme = ThemeData(
+  brightness: Brightness.light,
+  primarySwatch: Colors.indigo,
+  scaffoldBackgroundColor: Colors.grey[100],
+  cardColor: Colors.white,
+  appBarTheme: const AppBarTheme(
+    backgroundColor: Colors.indigo,
+    foregroundColor: Colors.white,
+  ),
+  floatingActionButtonTheme: const FloatingActionButtonThemeData(
+    backgroundColor: Colors.indigo,
+    foregroundColor: Colors.white,
+  ),
+  iconTheme: const IconThemeData(color: Colors.indigo),
+);
+
+// Define our custom dark theme data.
+final ThemeData darkTheme = ThemeData(
+  brightness: Brightness.dark,
+  primarySwatch: Colors.teal,
+  scaffoldBackgroundColor: const Color(0xFF121212),
+  cardColor: const Color(0xFF1E1E1E),
+  appBarTheme: const AppBarTheme(
+    backgroundColor: Colors.teal,
+    foregroundColor: Colors.white,
+  ),
+  floatingActionButtonTheme: const FloatingActionButtonThemeData(
+    backgroundColor: Colors.teal,
+    foregroundColor: Colors.white,
+  ),
+  iconTheme: IconThemeData(color: Colors.teal.shade200),
+);
